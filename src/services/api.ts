@@ -7,15 +7,23 @@ const api = axios.create({
   },
 });
 
+// Add a request interceptor to add the auth token
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
-    if (token && config.headers) {
+    const token = localStorage.getItem('access_token');
+    const scope = localStorage.getItem('app_scope') || 'CONSOLIDATED';
+    
+    if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+    
+    config.headers['X-Scope'] = scope;
+    
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => {
+    return Promise.reject(error);
+  }
 );
 
 export default api;

@@ -11,10 +11,13 @@ import {
   LogOut,
   Menu,
   X,
-  Church
+  Church,
+  Calendar,
+  ShieldCheck
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useAuth } from '../context/AuthContext';
+import { ScopeSwitcher } from '../components/ScopeSwitcher';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -22,20 +25,27 @@ function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-const navItems = [
-  { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
-  { icon: ArrowUpRight, label: 'Transações', path: '/transactions' },
-  { icon: Tags, label: 'Categorias', path: '/categories' },
-  { icon: Users, label: 'Usuários', path: '/users' },
-  { icon: UserCircle, label: 'Perfil', path: '/profile' },
-];
-
 export default function DashboardLayout() {
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
   const [isDesktopOpen, setIsDesktopOpen] = React.useState(true);
   const location = useLocation();
   const navigate = useNavigate();
   const { logout, user } = useAuth();
+
+  const isAdmin = user?.role === 'ADMIN' || user?.role === 'GLOBAL_ADMIN';
+
+  const navItems = [
+    { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
+    { icon: ArrowUpRight, label: 'Transações', path: '/transactions' },
+    { icon: Tags, label: 'Categorias', path: '/categories' },
+    { icon: Calendar, label: 'Períodos', path: '/periods' },
+    { icon: Users, label: 'Usuários', path: '/users' },
+    ...(isAdmin ? [
+      { icon: ShieldCheck, label: 'Auditoria', path: '/audit' },
+      { icon: LayoutDashboard, label: 'Templates', path: '/category-templates' }
+    ] : []),
+    { icon: UserCircle, label: 'Perfil', path: '/profile' },
+  ];
 
   // Close mobile sidebar on route change
   React.useEffect(() => {
@@ -156,7 +166,8 @@ export default function DashboardLayout() {
             </button>
           </div>
           <div className="flex items-center space-x-4">
-            <span className="text-xs md:text-sm text-gray-500 font-medium capitalize">
+            <ScopeSwitcher />
+            <span className="hidden md:inline text-xs md:text-sm text-gray-500 font-medium capitalize">
               {new Date().toLocaleDateString('pt-BR', { weekday: 'short', day: 'numeric', month: 'short' })}
             </span>
           </div>
