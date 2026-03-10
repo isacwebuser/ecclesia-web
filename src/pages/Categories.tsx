@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Plus,
+import { 
+  Plus, 
   MoreVertical,
   Tag,
   ShoppingBag,
@@ -13,8 +13,7 @@ import {
   X,
   Layout,
   Palette,
-  Type as TypeIcon,
-  Loader2
+  Type as TypeIcon
 } from 'lucide-react';
 import { categoryService } from '../services/categoryService';
 import { categoryTemplateService } from '../services/categoryTemplateService';
@@ -41,11 +40,9 @@ export default function Categories() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [templates, setTemplates] = useState<CategoryTemplate[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
     name: '',
     templateId: '',
-    type: 'EXPENSE' as 'INCOME' | 'EXPENSE',
     icon: 'Tag',
     color: 'bg-blue-50 text-blue-600'
   });
@@ -54,21 +51,9 @@ export default function Categories() {
     loadData();
   }, []);
 
-  const loadData = async () => {
-    try {
-      setLoading(true);
-      const [cats, tmpls] = await Promise.all([
-        categoryService.getCategories(),
-        categoryTemplateService.getTemplates()
-      ]);
-      setCategories(cats);
-      setTemplates(tmpls);
-    } catch (error) {
-      console.error('Error loading categories data', error);
-      toast.error('Erro ao carregar categorias.');
-    } finally {
-      setLoading(false);
-    }
+  const loadData = () => {
+    setCategories(categoryService.getCategories());
+    setTemplates(categoryTemplateService.getTemplates());
   };
 
   const handleTemplateChange = (templateId: string) => {
@@ -78,9 +63,8 @@ export default function Categories() {
         ...formData,
         templateId,
         name: template.name,
-        type: template.type || 'EXPENSE',
-        icon: template.icon || 'Tag',
-        color: template.color || 'bg-blue-50 text-blue-600'
+        icon: template.icon,
+        color: template.color
       });
     } else {
       setFormData({
@@ -90,36 +74,24 @@ export default function Categories() {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const payload = {
-        name: formData.name,
-        type: formData.type,
-        color: formData.color,
-        icon: formData.icon,
-        templateId: formData.templateId || undefined,
-        custom: !formData.templateId
-      };
-      await categoryService.createCategory(payload);
+      categoryService.createCategory(formData);
       toast.success('Categoria criada com sucesso!');
-      await loadData();
+      loadData();
       setIsModalOpen(false);
-      setFormData({ name: '', templateId: '', type: 'EXPENSE', icon: 'Tag', color: 'bg-blue-50 text-blue-600' });
+      setFormData({ name: '', templateId: '', icon: 'Tag', color: 'bg-blue-50 text-blue-600' });
     } catch (error) {
       toast.error('Erro ao criar categoria');
     }
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = (id: string) => {
     if (confirm('Tem certeza que deseja excluir esta categoria?')) {
-      try {
-        await categoryService.deleteCategory(id);
-        toast.success('Categoria excluída com sucesso!');
-        await loadData();
-      } catch (error) {
-        toast.error('Erro ao excluir categoria');
-      }
+      categoryService.deleteCategory(id);
+      loadData();
+      toast.success('Categoria excluída com sucesso!');
     }
   };
 
@@ -130,7 +102,7 @@ export default function Categories() {
           <h1 className="text-2xl font-bold text-gray-900">Categorias</h1>
           <p className="text-gray-500 text-sm">Organize suas transações por categorias personalizadas</p>
         </div>
-        <button
+        <button 
           onClick={() => setIsModalOpen(true)}
           className="w-full sm:w-auto flex items-center justify-center px-4 py-2 bg-emerald-600 text-white rounded-xl text-sm font-bold hover:bg-emerald-700 transition-colors shadow-lg shadow-emerald-200"
         >
@@ -139,50 +111,38 @@ export default function Categories() {
         </button>
       </div>
 
-      {loading ? (
-        <div className="flex h-64 items-center justify-center">
-          <Loader2 className="w-8 h-8 text-emerald-600 animate-spin" />
-        </div>
-      ) : categories.length === 0 ? (
-        <div className="bg-white p-12 rounded-2xl border border-gray-100 shadow-sm text-center">
-          <Tag className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-          <h3 className="text-lg font-bold text-gray-900 mb-2">Nenhuma categoria encontrada</h3>
-          <p className="text-gray-500">Crie sua primeira categoria para começar a organizar.</p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {categories.map((cat) => {
-            const IconComponent = ICON_MAP[cat.icon || 'Tag'] || Tag;
-            return (
-              <div key={cat.id} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow group">
-                <div className="flex items-center justify-between mb-6">
-                  <div className={cn("p-3 rounded-xl", cat.color || 'bg-gray-50 text-gray-600')}>
-                    <IconComponent className="w-6 h-6" />
-                  </div>
-                  <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button
-                      onClick={() => handleDelete(cat.id)}
-                      className="p-1 hover:bg-red-50 rounded-lg text-red-400"
-                    >
-                      <MoreVertical className="w-4 h-4" />
-                    </button>
-                  </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {categories.map((cat) => {
+          const IconComponent = ICON_MAP[cat.icon || 'Tag'] || Tag;
+          return (
+            <div key={cat.id} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow group">
+              <div className="flex items-center justify-between mb-6">
+                <div className={cn("p-3 rounded-xl", cat.color || 'bg-gray-50 text-gray-600')}>
+                  <IconComponent className="w-6 h-6" />
                 </div>
-                <h3 className="text-lg font-bold text-gray-900">{cat.name}</h3>
-                {cat.templateId && (
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400 bg-gray-50 px-2 py-0.5 rounded-full">
-                    Template Associado
-                  </span>
-                )}
-                <div className="mt-4 flex items-center justify-between">
-                  <span className="text-sm text-gray-500">{cat.count || 0} transações</span>
-                  <span className="text-sm font-bold text-gray-900">R$ {(cat.total || 0).toLocaleString('pt-BR')}</span>
+                <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button 
+                    onClick={() => handleDelete(cat.id)}
+                    className="p-1 hover:bg-red-50 rounded-lg text-red-400"
+                  >
+                    <MoreVertical className="w-4 h-4" />
+                  </button>
                 </div>
               </div>
-            );
-          })}
-        </div>
-      )}
+              <h3 className="text-lg font-bold text-gray-900">{cat.name}</h3>
+              {cat.templateId && (
+                <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400 bg-gray-50 px-2 py-0.5 rounded-full">
+                  Template Associado
+                </span>
+              )}
+              <div className="mt-4 flex items-center justify-between">
+                <span className="text-sm text-gray-500">{cat.count || 0} transações</span>
+                <span className="text-sm font-bold text-gray-900">R$ {(cat.total || 0).toLocaleString('pt-BR')}</span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
 
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
@@ -193,7 +153,7 @@ export default function Categories() {
                 <X className="w-5 h-5 text-gray-500" />
               </button>
             </div>
-
+            
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-1">Template (Opcional)</label>
@@ -210,20 +170,6 @@ export default function Categories() {
                 <p className="mt-1 text-[10px] text-gray-400 italic">Selecionar um template preenche automaticamente os campos abaixo.</p>
               </div>
 
-              {!formData.templateId && (
-                <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-1">Tipo da Categoria</label>
-                  <select
-                    className="w-full px-4 py-2 bg-gray-50 border-none rounded-xl text-sm focus:ring-2 focus:ring-emerald-500 mb-4"
-                    value={formData.type}
-                    onChange={e => setFormData({ ...formData, type: e.target.value as 'INCOME' | 'EXPENSE' })}
-                  >
-                    <option value="EXPENSE">Despesa</option>
-                    <option value="INCOME">Receita</option>
-                  </select>
-                </div>
-              )}
-
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-1">Nome da Categoria</label>
                 <div className="relative">
@@ -234,7 +180,7 @@ export default function Categories() {
                     className="w-full pl-10 pr-4 py-2 bg-gray-50 border-none rounded-xl text-sm focus:ring-2 focus:ring-emerald-500"
                     placeholder="Ex: Manutenção"
                     value={formData.name}
-                    onChange={e => setFormData({ ...formData, name: e.target.value })}
+                    onChange={e => setFormData({...formData, name: e.target.value})}
                   />
                 </div>
               </div>
@@ -245,7 +191,7 @@ export default function Categories() {
                   <select
                     className="w-full px-4 py-2 bg-gray-50 border-none rounded-xl text-sm focus:ring-2 focus:ring-emerald-500"
                     value={formData.icon}
-                    onChange={e => setFormData({ ...formData, icon: e.target.value })}
+                    onChange={e => setFormData({...formData, icon: e.target.value})}
                   >
                     {Object.keys(ICON_MAP).map(iconName => (
                       <option key={iconName} value={iconName}>{iconName}</option>
@@ -257,7 +203,7 @@ export default function Categories() {
                   <select
                     className="w-full px-4 py-2 bg-gray-50 border-none rounded-xl text-sm focus:ring-2 focus:ring-emerald-500"
                     value={formData.color}
-                    onChange={e => setFormData({ ...formData, color: e.target.value })}
+                    onChange={e => setFormData({...formData, color: e.target.value})}
                   >
                     <option value="bg-blue-50 text-blue-600">Azul</option>
                     <option value="bg-emerald-50 text-emerald-600">Verde</option>

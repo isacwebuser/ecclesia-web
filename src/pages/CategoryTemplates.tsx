@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Plus,
-  Search,
-  Layout,
-  MoreVertical,
-  Edit2,
-  Trash2,
+import { 
+  Plus, 
+  Search, 
+  Layout, 
+  MoreVertical, 
+  Edit2, 
+  Trash2, 
   X,
   Palette,
   Type
@@ -21,9 +21,6 @@ export default function CategoryTemplates() {
   const [editingTemplate, setEditingTemplate] = useState<CategoryTemplate | null>(null);
   const [formData, setFormData] = useState({
     name: '',
-    type: 'EXPENSE' as 'INCOME' | 'EXPENSE',
-    code: '',
-    mandatory: false,
     description: '',
     icon: 'Tag',
     color: 'bg-blue-50 text-blue-600'
@@ -42,20 +39,14 @@ export default function CategoryTemplates() {
       setEditingTemplate(template);
       setFormData({
         name: template.name,
-        type: template.type || 'EXPENSE',
-        code: template.code || '',
-        mandatory: template.mandatory || false,
-        description: template.description || '',
-        icon: template.icon || 'Tag',
-        color: template.color || 'bg-blue-50 text-blue-600'
+        description: template.description,
+        icon: template.icon,
+        color: template.color
       });
     } else {
       setEditingTemplate(null);
       setFormData({
         name: '',
-        type: 'EXPENSE',
-        code: '',
-        mandatory: false,
         description: '',
         icon: 'Tag',
         color: 'bg-blue-50 text-blue-600'
@@ -64,34 +55,34 @@ export default function CategoryTemplates() {
     setIsModalOpen(true);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     try {
       if (editingTemplate) {
-        await categoryTemplateService.updateTemplate(editingTemplate.id, formData);
+        categoryTemplateService.updateTemplate(editingTemplate.id, formData);
         toast.success('Template atualizado com sucesso!');
       } else {
-        await categoryTemplateService.createTemplate(formData);
+        categoryTemplateService.createTemplate(formData);
         toast.success('Template criado com sucesso!');
       }
-      await loadTemplates();
+      loadTemplates();
       setIsModalOpen(false);
     } catch (error) {
       toast.error('Erro ao salvar template');
     }
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = (id: string) => {
     if (confirm('Tem certeza que deseja excluir este template?')) {
-      await categoryTemplateService.deleteTemplate(id);
-      await loadTemplates();
+      categoryTemplateService.deleteTemplate(id);
+      loadTemplates();
       toast.success('Template excluído com sucesso!');
     }
   };
 
-  const filteredTemplates = templates.filter(t =>
-    (t.name || '').toLowerCase().includes((searchTerm || '').toLowerCase()) ||
-    (t.description || '').toLowerCase().includes((searchTerm || '').toLowerCase())
+  const filteredTemplates = templates.filter(t => 
+    t.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    t.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -101,7 +92,7 @@ export default function CategoryTemplates() {
           <h1 className="text-2xl font-bold text-gray-900">Templates de Categorias</h1>
           <p className="text-gray-500 text-sm">Gerencie padrões de categorias para sua plataforma SaaS</p>
         </div>
-        <button
+        <button 
           onClick={() => handleOpenModal()}
           className="w-full sm:w-auto flex items-center justify-center px-4 py-2 bg-indigo-600 text-white rounded-xl text-sm font-bold hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200"
         >
@@ -131,13 +122,13 @@ export default function CategoryTemplates() {
                 <Layout className="w-6 h-6" />
               </div>
               <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <button
+                <button 
                   onClick={() => handleOpenModal(template)}
                   className="p-2 hover:bg-gray-50 rounded-lg text-gray-400 hover:text-indigo-600"
                 >
                   <Edit2 className="w-4 h-4" />
                 </button>
-                <button
+                <button 
                   onClick={() => handleDelete(template.id)}
                   className="p-2 hover:bg-gray-50 rounded-lg text-gray-400 hover:text-red-600"
                 >
@@ -166,59 +157,20 @@ export default function CategoryTemplates() {
                 <X className="w-5 h-5 text-gray-500" />
               </button>
             </div>
-
+            
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-1">Nome do Template</label>
-                  <div className="relative">
-                    <Type className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                    <input
-                      required
-                      type="text"
-                      className="w-full pl-10 pr-4 py-2 bg-gray-50 border-none rounded-xl text-sm focus:ring-2 focus:ring-indigo-500"
-                      placeholder="Ex: Alimentação"
-                      value={formData.name}
-                      onChange={e => setFormData({ ...formData, name: e.target.value })}
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-1">Código</label>
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1">Nome do Template</label>
+                <div className="relative">
+                  <Type className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                   <input
                     required
                     type="text"
-                    className="w-full px-4 py-2 bg-gray-50 border-none rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 uppercase"
-                    placeholder="Ex: ALIMENTACAO"
-                    value={formData.code}
-                    onChange={e => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
+                    className="w-full pl-10 pr-4 py-2 bg-gray-50 border-none rounded-xl text-sm focus:ring-2 focus:ring-indigo-500"
+                    placeholder="Ex: Alimentação"
+                    value={formData.name}
+                    onChange={e => setFormData({...formData, name: e.target.value})}
                   />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-1">Tipo</label>
-                  <select
-                    className="w-full px-4 py-2 bg-gray-50 border-none rounded-xl text-sm focus:ring-2 focus:ring-indigo-500"
-                    value={formData.type}
-                    onChange={e => setFormData({ ...formData, type: e.target.value as 'INCOME' | 'EXPENSE' })}
-                  >
-                    <option value="EXPENSE">Despesa</option>
-                    <option value="INCOME">Receita</option>
-                  </select>
-                </div>
-                <div className="flex items-center mt-6">
-                  <input
-                    type="checkbox"
-                    id="mandatory"
-                    className="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
-                    checked={formData.mandatory}
-                    onChange={e => setFormData({ ...formData, mandatory: e.target.checked })}
-                  />
-                  <label htmlFor="mandatory" className="ml-2 block text-sm text-gray-700">
-                    Obrigatório
-                  </label>
                 </div>
               </div>
 
@@ -228,7 +180,7 @@ export default function CategoryTemplates() {
                   className="w-full px-4 py-2 bg-gray-50 border-none rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 min-h-[100px]"
                   placeholder="Descreva o propósito deste template..."
                   value={formData.description}
-                  onChange={e => setFormData({ ...formData, description: e.target.value })}
+                  onChange={e => setFormData({...formData, description: e.target.value})}
                 />
               </div>
 
@@ -238,7 +190,7 @@ export default function CategoryTemplates() {
                   <select
                     className="w-full px-4 py-2 bg-gray-50 border-none rounded-xl text-sm focus:ring-2 focus:ring-indigo-500"
                     value={formData.icon}
-                    onChange={e => setFormData({ ...formData, icon: e.target.value })}
+                    onChange={e => setFormData({...formData, icon: e.target.value})}
                   >
                     <option value="Tag">Tag</option>
                     <option value="Coffee">Café</option>
@@ -253,7 +205,7 @@ export default function CategoryTemplates() {
                   <select
                     className="w-full px-4 py-2 bg-gray-50 border-none rounded-xl text-sm focus:ring-2 focus:ring-indigo-500"
                     value={formData.color}
-                    onChange={e => setFormData({ ...formData, color: e.target.value })}
+                    onChange={e => setFormData({...formData, color: e.target.value})}
                   >
                     <option value="bg-blue-50 text-blue-600">Azul</option>
                     <option value="bg-emerald-50 text-emerald-600">Verde</option>

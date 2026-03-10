@@ -2,22 +2,16 @@ export type TransactionType = 'INCOME' | 'EXPENSE';
 
 export interface CategoryTemplate {
   id: string;
-  code: string;
   name: string;
-  type: TransactionType;
-  mandatory?: boolean;
-  description?: string;
-  icon?: string;
-  color?: string;
+  description: string;
+  icon: string;
+  color: string;
   defaultBudget?: number;
 }
 
 export interface Category {
   id: string;
   name: string;
-  type?: TransactionType;
-  custom?: boolean;
-  active?: boolean;
   icon?: string;
   color?: string;
   templateId?: string;
@@ -33,14 +27,6 @@ export interface Transaction {
   type: TransactionType;
   categoryId: string;
   categoryName?: string;
-}
-
-export interface CreateTransactionRequest {
-  description: string;
-  amount: number;
-  date: string;
-  type: TransactionType;
-  categoryId: string;
 }
 
 export interface User {

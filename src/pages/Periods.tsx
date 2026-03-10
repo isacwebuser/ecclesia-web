@@ -35,7 +35,7 @@ export default function Periods() {
   const handleClosePeriod = async (id: string, month: number, year: number) => {
     try {
       setActionLoading(id);
-      await periodsService.closePeriod(year, month);
+      await periodsService.closePeriod(id);
       toast.success(`Período ${MONTH_NAMES[month - 1]}/${year} fechado com sucesso!`);
       fetchPeriods();
     } catch (error) {
@@ -49,13 +49,7 @@ export default function Periods() {
   const handleReopenPeriod = async (id: string, month: number, year: number) => {
     try {
       setActionLoading(id);
-      // Mocked reason prompt
-      const reason = window.prompt("Motivo para reabrir o período:");
-      if (!reason) {
-        setActionLoading(null);
-        return;
-      }
-      await periodsService.reopenPeriod(year, month, reason);
+      await periodsService.reopenPeriod(id);
       toast.success(`Período ${MONTH_NAMES[month - 1]}/${year} reaberto com sucesso!`);
       fetchPeriods();
     } catch (error) {

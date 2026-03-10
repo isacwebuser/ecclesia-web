@@ -1,61 +1,44 @@
-import React, { useState, useEffect } from 'react';
-import {
-  TrendingUp,
-  TrendingDown,
-  Wallet,
-  ArrowUpRight,
+import React from 'react';
+import { 
+  TrendingUp, 
+  TrendingDown, 
+  Wallet, 
+  ArrowUpRight, 
   ArrowDownLeft,
-  Calendar,
-  Loader2
+  Calendar
 } from 'lucide-react';
-import {
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer
+import { 
+  AreaChart, 
+  Area, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  Cell
 } from 'recharts';
-import { dashboardService, ReportSummaryDto } from '../services/dashboard.service';
-import { transactionsService } from '../services/transactions.service';
-import { Transaction } from '../types';
+
+const data = [
+  { name: 'Jan', income: 4000, expense: 2400 },
+  { name: 'Fev', income: 3000, expense: 1398 },
+  { name: 'Mar', income: 2000, expense: 9800 },
+  { name: 'Abr', income: 2780, expense: 3908 },
+  { name: 'Mai', income: 1890, expense: 4800 },
+  { name: 'Jun', income: 2390, expense: 3800 },
+  { name: 'Jul', income: 3490, expense: 4300 },
+];
+
+const recentTransactions = [
+  { id: '1', description: 'Dízimo - João Silva', amount: 500, type: 'INCOME', date: '2024-03-20', category: 'Dízimos' },
+  { id: '2', description: 'Conta de Luz', amount: 350.50, type: 'EXPENSE', date: '2024-03-19', category: 'Utilidades' },
+  { id: '3', description: 'Oferta Especial', amount: 1200, type: 'INCOME', date: '2024-03-18', category: 'Ofertas' },
+  { id: '4', description: 'Manutenção Ar Condicionado', amount: 450, type: 'EXPENSE', date: '2024-03-17', category: 'Manutenção' },
+  { id: '5', description: 'Compra de Materiais', amount: 120.80, type: 'EXPENSE', date: '2024-03-16', category: 'Escritório' },
+];
 
 export default function Dashboard() {
-  const [summary, setSummary] = useState<ReportSummaryDto | null>(null);
-  const [recentTransactions, setRecentTransactions] = useState<Transaction[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function loadDashboard() {
-      try {
-        const [sumData, txData] = await Promise.all([
-          dashboardService.getSummary(),
-          transactionsService.getTransactions()
-        ]);
-        setSummary(sumData);
-        // show last 5 transactions
-        setRecentTransactions(txData.slice(0, 5));
-      } catch (err) {
-        console.error('Error loading dashboard data', err);
-      } finally {
-        setLoading(false);
-      }
-    }
-    loadDashboard();
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="flex h-64 items-center justify-center">
-        <Loader2 className="w-8 h-8 text-emerald-600 animate-spin" />
-      </div>
-    );
-  }
-
-  // Default empty state protection if summary fails
-  const safeData = summary?.monthlyData || [];
-
   return (
     <div className="space-y-8">
       {/* Summary Cards */}
@@ -68,7 +51,7 @@ export default function Dashboard() {
             <span className="text-[10px] md:text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full">+12.5%</span>
           </div>
           <p className="text-xs md:text-sm text-gray-500 font-medium">Saldo Atual</p>
-          <h3 className="text-xl md:text-2xl font-bold text-gray-900 mt-1">R$ {(summary?.balance || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</h3>
+          <h3 className="text-xl md:text-2xl font-bold text-gray-900 mt-1">R$ 15.420,50</h3>
         </div>
 
         <div className="bg-white p-5 md:p-6 rounded-2xl border border-gray-100 shadow-sm">
@@ -76,9 +59,10 @@ export default function Dashboard() {
             <div className="p-2 bg-blue-50 rounded-lg">
               <TrendingUp className="w-6 h-6 text-blue-600" />
             </div>
+            <span className="text-[10px] md:text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-1 rounded-full">+8.2%</span>
           </div>
           <p className="text-xs md:text-sm text-gray-500 font-medium">Receitas (Mês)</p>
-          <h3 className="text-xl md:text-2xl font-bold text-gray-900 mt-1">R$ {(summary?.totalIncome || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</h3>
+          <h3 className="text-xl md:text-2xl font-bold text-gray-900 mt-1">R$ 8.240,00</h3>
         </div>
 
         <div className="bg-white p-5 md:p-6 rounded-2xl border border-gray-100 shadow-sm sm:col-span-2 lg:col-span-1">
@@ -86,9 +70,10 @@ export default function Dashboard() {
             <div className="p-2 bg-red-50 rounded-lg">
               <TrendingDown className="w-6 h-6 text-red-600" />
             </div>
+            <span className="text-[10px] md:text-xs font-semibold text-red-600 bg-red-50 px-2 py-1 rounded-full">-3.1%</span>
           </div>
           <p className="text-xs md:text-sm text-gray-500 font-medium">Despesas (Mês)</p>
-          <h3 className="text-xl md:text-2xl font-bold text-gray-900 mt-1">R$ {(summary?.totalExpense || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</h3>
+          <h3 className="text-xl md:text-2xl font-bold text-gray-900 mt-1">R$ 3.120,40</h3>
         </div>
       </div>
 
@@ -98,44 +83,36 @@ export default function Dashboard() {
           <h4 className="text-lg font-bold text-gray-900 mb-6">Fluxo de Caixa</h4>
           <div className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={safeData}>
+              <AreaChart data={data}>
                 <defs>
                   <linearGradient id="colorIncome" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#10B981" stopOpacity={0.1} />
-                    <stop offset="95%" stopColor="#10B981" stopOpacity={0} />
+                    <stop offset="5%" stopColor="#10B981" stopOpacity={0.1}/>
+                    <stop offset="95%" stopColor="#10B981" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F3F4F6" />
-                <XAxis
-                  dataKey="month"
-                  axisLine={false}
-                  tickLine={false}
+                <XAxis 
+                  dataKey="name" 
+                  axisLine={false} 
+                  tickLine={false} 
                   tick={{ fill: '#9CA3AF', fontSize: 12 }}
                   dy={10}
                 />
-                <YAxis
-                  axisLine={false}
-                  tickLine={false}
+                <YAxis 
+                  axisLine={false} 
+                  tickLine={false} 
                   tick={{ fill: '#9CA3AF', fontSize: 12 }}
                 />
-                <Tooltip
+                <Tooltip 
                   contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
                 />
-                <Area
-                  type="monotone"
-                  dataKey="income"
-                  stroke="#10B981"
+                <Area 
+                  type="monotone" 
+                  dataKey="income" 
+                  stroke="#10B981" 
                   strokeWidth={2}
-                  fillOpacity={1}
-                  fill="url(#colorIncome)"
-                />
-                <Area
-                  type="monotone"
-                  dataKey="expense"
-                  stroke="#EF4444"
-                  strokeWidth={2}
-                  fillOpacity={0}
-                  fill="transparent"
+                  fillOpacity={1} 
+                  fill="url(#colorIncome)" 
                 />
               </AreaChart>
             </ResponsiveContainer>
@@ -160,7 +137,7 @@ export default function Dashboard() {
                   </div>
                   <div>
                     <p className="text-sm font-semibold text-gray-900">{tx.description}</p>
-                    <p className="text-xs text-gray-500">{tx.categoryName || 'Sem Categoria'} • {new Date(tx.date).toLocaleDateString('pt-BR')}</p>
+                    <p className="text-xs text-gray-500">{tx.category} • {new Date(tx.date).toLocaleDateString('pt-BR')}</p>
                   </div>
                 </div>
                 <p className={cn(

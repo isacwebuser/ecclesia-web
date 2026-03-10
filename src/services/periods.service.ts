@@ -11,19 +11,17 @@ export interface AccountingPeriod {
 
 export const periodsService = {
   getPeriods: async () => {
-    const response = await api.get<AccountingPeriod[]>('/finance/periods');
+    const response = await api.get<AccountingPeriod[]>('/periods');
     return response.data;
   },
 
-  closePeriod: async (year: number, month: number) => {
-    const response = await api.post(`/finance/periods/${year}/${month}/close`);
+  closePeriod: async (id: string) => {
+    const response = await api.post(`/periods/${id}/close`);
     return response.data;
   },
 
-  reopenPeriod: async (year: number, month: number, reason: string = 'Reabertura manual') => {
-    const response = await api.post(`/finance/periods/${year}/${month}/reopen`, null, {
-      params: { reason }
-    });
+  reopenPeriod: async (id: string) => {
+    const response = await api.post(`/periods/${id}/reopen`);
     return response.data;
   },
 };

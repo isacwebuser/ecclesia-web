@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import {
-  History,
-  Download,
-  Search,
-  Filter,
-  FileText,
+import { 
+  History, 
+  Download, 
+  Search, 
+  Filter, 
+  FileText, 
   Table as TableIcon,
   ChevronLeft,
   ChevronRight,
@@ -33,9 +33,9 @@ export default function Audit() {
   const fetchLogs = async () => {
     try {
       setLoading(true);
-      const data = await auditService.getLogs(page, 20, {
+      const data = await auditService.getLogs(page, 20, { 
         search: searchTerm,
-        entity: entityFilter
+        entity: entityFilter 
       });
       setLogs(data.content);
       setTotalPages(data.totalPages);
@@ -57,9 +57,9 @@ export default function Audit() {
   const handleExport = async (type: 'CSV' | 'PDF') => {
     try {
       setExporting(true);
-      await auditService.exportReport(type, {
+      await auditService.exportReport(type, { 
         search: searchTerm,
-        entity: entityFilter
+        entity: entityFilter 
       });
       toast.success(`Relatório ${type} exportado com sucesso`);
     } catch (error) {
@@ -193,26 +193,27 @@ export default function Audit() {
                 logs.map((log) => (
                   <tr key={log.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4 text-sm text-gray-600 whitespace-nowrap">
-                      {log.changedAt ? format(new Date(log.changedAt), "dd/MM/yyyy HH:mm", { locale: ptBR }) : '-'}
+                      {format(new Date(log.timestamp), "dd/MM/yyyy HH:mm", { locale: ptBR })}
                     </td>
                     <td className="px-6 py-4">
-                      <div className="text-sm font-medium text-gray-900">{log.changedByLogin || 'Sistema'}</div>
-                      <div className="text-xs text-gray-500">{log.changedByUserId || '-'}</div>
+                      <div className="text-sm font-medium text-gray-900">{log.userName}</div>
+                      <div className="text-xs text-gray-500">{log.userId}</div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${log.action?.includes('CREATE') ? 'bg-blue-100 text-blue-800' :
-                          log.action?.includes('UPDATE') ? 'bg-amber-100 text-amber-800' :
-                            log.action?.includes('DELETE') ? 'bg-red-100 text-red-800' :
-                              'bg-gray-100 text-gray-800'
-                        }`}>
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        log.action.includes('CREATE') ? 'bg-blue-100 text-blue-800' :
+                        log.action.includes('UPDATE') ? 'bg-amber-100 text-amber-800' :
+                        log.action.includes('DELETE') ? 'bg-red-100 text-red-800' :
+                        'bg-gray-100 text-gray-800'
+                      }`}>
                         {log.action}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-600">
-                      {log.entityType}
+                      {log.entityName}
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-600 max-w-xs truncate" title={JSON.stringify(log.changedFields || log.afterSnapshot || {})}>
-                      {log.changedFields ? Object.keys(log.changedFields).join(', ') + ' atualizados' : 'Sem detalhes'}
+                    <td className="px-6 py-4 text-sm text-gray-600 max-w-xs truncate" title={log.details}>
+                      {log.details}
                     </td>
                   </tr>
                 ))

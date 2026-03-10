@@ -1,35 +1,34 @@
 import React, { useState } from 'react';
-import { useNavigate, Navigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Church, Mail, Lock, Loader2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { toast } from 'sonner';
-import { authService } from '../services/auth.service';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { login, isAuthenticated, loading } = useAuth();
+  const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
-    try {
-      const response = await authService.login(email, password);
-      login(response.accessToken, response.refreshToken);
-      toast.success('Bem-vindo de volta!');
-      navigate('/', { replace: true });
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Erro ao autenticar no servidor. Verifique suas credenciais.');
-    } finally {
+    // Mock login logic
+    setTimeout(() => {
+      if (email === 'admin@ecclesia.com' && password === 'admin123') {
+        // Mock token
+        const mockToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbkBlY2NsZXNpYS5jb20iLCJ0ZW5hbnRJZCI6IjEiLCJyb2xlIjoiQURNSU4iLCJzdGF0dXMiOiJBQ1RJVkUiLCJleHAiOjE5OTk5OTk5OTl9.signature';
+        login(mockToken, 'refresh');
+        toast.success('Bem-vindo de volta!');
+        navigate('/');
+      } else {
+        toast.error('Credenciais inválidas. Use admin@ecclesia.com / admin123');
+      }
       setIsLoading(false);
-    }
+    }, 1000);
   };
-
-  if (loading) return null;
-  if (isAuthenticated) return <Navigate to="/" replace />;
 
   return (
     <div className="min-h-screen bg-[#F8F9FA] flex items-center justify-center p-4">
@@ -93,9 +92,9 @@ export default function Login() {
             </p>
           </div>
         </div>
-
+        
         <div className="mt-8 text-center">
-          <p className="text-xs text-gray-400 uppercase tracking-widest font-bold">Acesse o sistema com sua conta.</p>
+          <p className="text-xs text-gray-400 uppercase tracking-widest font-bold">Admin Demo: admin@ecclesia.com / admin123</p>
         </div>
       </div>
     </div>
