@@ -1,13 +1,13 @@
 import React from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  ArrowUpRight, 
-  ArrowDownLeft, 
-  Tags, 
-  Users, 
-  UserCircle, 
-  Settings, 
+import {
+  LayoutDashboard,
+  ArrowUpRight,
+  ArrowDownLeft,
+  Tags,
+  Users,
+  UserCircle,
+  Settings,
   LogOut,
   Menu,
   X,
@@ -41,9 +41,9 @@ export default function DashboardLayout() {
     { icon: Calendar, label: 'Períodos', path: '/periods' },
     { icon: Users, label: 'Usuários', path: '/users' },
     ...(isAdmin ? [
-      { icon: ShieldCheck, label: 'Auditoria', path: '/audit' },
-      { icon: LayoutDashboard, label: 'Templates', path: '/category-templates' }
+      { icon: ShieldCheck, label: 'Auditoria', path: '/audit' }
     ] : []),
+    { icon: LayoutDashboard, label: 'Templates', path: '/category-templates' },
     { icon: UserCircle, label: 'Perfil', path: '/profile' },
   ];
 
@@ -73,7 +73,7 @@ export default function DashboardLayout() {
       </AnimatePresence>
 
       {/* Sidebar */}
-      <aside 
+      <aside
         className={cn(
           "fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 transition-transform duration-300 lg:relative lg:translate-x-0",
           !isSidebarOpen && "-translate-x-full lg:translate-x-0",
@@ -89,7 +89,7 @@ export default function DashboardLayout() {
                 <span className="ml-3 font-bold text-xl tracking-tight text-gray-900">Ecclesia</span>
               )}
             </div>
-            <button 
+            <button
               onClick={() => setIsSidebarOpen(false)}
               className="p-1 hover:bg-gray-100 rounded-lg lg:hidden"
             >
@@ -108,8 +108,8 @@ export default function DashboardLayout() {
                   to={item.path}
                   className={cn(
                     "flex items-center px-3 py-2 rounded-lg transition-colors group",
-                    isActive 
-                      ? "bg-emerald-50 text-emerald-700" 
+                    isActive
+                      ? "bg-emerald-50 text-emerald-700"
                       : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                   )}
                 >
@@ -152,13 +152,13 @@ export default function DashboardLayout() {
         {/* Header */}
         <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 md:px-8 shrink-0">
           <div className="flex items-center gap-4">
-            <button 
+            <button
               onClick={() => setIsSidebarOpen(true)}
               className="p-2 hover:bg-gray-100 rounded-lg lg:hidden"
             >
               <Menu className="w-6 h-6 text-gray-600" />
             </button>
-            <button 
+            <button
               onClick={() => setIsDesktopOpen(!isDesktopOpen)}
               className="p-2 hover:bg-gray-100 rounded-lg hidden lg:block text-gray-400 hover:text-gray-600"
             >
